@@ -12,6 +12,9 @@ conn.close()
 
 repos = json.loads(repos_raw)
 
+for i in range(len(repos["results"])):
+    info=repos["results"][i]
+    print("La id del medicamento es", info["id"])
 
 
 
