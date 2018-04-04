@@ -19,7 +19,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     repos = json.loads(repos_raw)
 
     for i in range(len(repos["results"])):
-        info=repos[i]
+        info=repos["results"][i]
 
     def do_GET(self):
 
