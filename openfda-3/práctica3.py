@@ -19,9 +19,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     repos = json.loads(repos_raw)
 
     for i in range(len(repos["results"])):
-        info=repos["results"][i]
-        print(info)
-
+        info=repos[i]
 
     def do_GET(self):
 
@@ -44,7 +42,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         mensaje += "</ul>"
         mensaje += "</body>"
         mensaje += "</html>"
-
+        mensaje += info
+        
         self.wfile.write(bytes(mensaje, "utf8"))
         print("Petición atendida!")
         return
