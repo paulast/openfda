@@ -14,8 +14,8 @@ repos = json.loads(repos_raw)
 
 repo = repos["results"][0]
 print("El id del medicamento es", repo["id"])
-print("El propósito del producto es", repo["purpose"])
-print("El nombre del fabricante es", repo["openfda"]["manufacturer_name"])
+print("El propósito del producto es", repo["purpose"][0])
+print("El nombre del fabricante es", repo["openfda"]["manufacturer_name"][0])
 
     
 
