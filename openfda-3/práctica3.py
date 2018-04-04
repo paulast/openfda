@@ -1,29 +1,13 @@
 import socket
 import http.client
 import json
+import http.server
+import socketserver
 
-
-IP = "192.168.1.1"
 PORT = 8020
-MAX_OPEN_REQUESTS = 5
 
-def process_client(clientsocket):
-    """Funcion que atiende al cliente. Lee su peticion (aunque la ignora)
-       y le envia un mensaje de respuesta en cuyo contenido hay texto
-       en HTML que se muestra en el navegador"""
+class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
-    
-    mensaje_solicitud = clientsocket.recv(1024)
-
-    contenido = """
-      <!doctype html>
-      <html>
-      <body style='background-color: blue'>
-        <h1>Hola!</h2>
-        <p>Estos son los 10 medicamentos</p>
-      </body>
-      </html>
-    """
     headers = {'User-Agent': 'http-client'}
 
     conn = http.client.HTTPSConnection("api.fda.gov")
@@ -37,33 +21,44 @@ def process_client(clientsocket):
 
     for i in range(len(repos["results"])):
         info=repos["results"][i]
-
-    linea_inicial = "HTTP/1.1 200 OK\n"
-    cabecera = "Content-Type: text/html\n"
-    cabecera += "Content-Length: {}\n".format(len(str.encode(contenido)))
-
-  
-    mensaje_respuesta = str.encode(linea_inicial + cabecera + "\n" + contenido + info["id"])
-    clientsocket.send(mensaje_respuesta)
-    clientsocket.close()
+        print(info)
 
 
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def do_GET(self):
+
+        # -- Envio de la respuesta al cliente
+
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+
+        mensaje = """
+        <!DOCTYPE>
+        <html>
+        <body>
+        """
+
+        mensaje += "<p>" + "Información sobre medicamentos" + "</p>"
+        mensaje += "<ul>"
+        mensaje += "<li>Recurso solicitado: {}</li>".format(self.path)
+        mensaje += "</ul>"
+        mensaje += "</body>"
+        mensaje += "</html>"
+
+        self.wfile.write(bytes(mensaje, "utf8"))
+        print("Petición atendida!")
+        return
+
+
+Handler = testHTTPRequestHandler
+
+httpd = socketserver.TCPServer(("", PORT), Handler)
+print("Sirviendo en puerto: {}".format(PORT))
+
 
 try:
-    
-    serversocket.bind((IP, PORT))
-    serversocket.listen(MAX_OPEN_REQUESTS)
-
-    
-    while True:
-        
-        print("Esperando clientes en IP: {}, Puerto: {}".format(IP, PORT))
-        (clientsocket, address) = serversocket.accept()
-
-        print("  Peticion de cliente recibida. IP: {}".format(address))
-        process_client(clientsocket)
-
-except socket.error:
-    print("Problemas usando el puerto {}".format(PORT))
-    print("Lanzalo en otro puerto (y verifica la IP)")
+    httpd.serve_forever()
+except KeyboardInterrupt:
+    print("Servidor detenido")
+    httpd.server_close()
