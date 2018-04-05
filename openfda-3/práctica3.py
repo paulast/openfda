@@ -19,7 +19,8 @@ conn.close()
 repos = json.loads(repos_raw)
 for i in range(len(repos["results"])):
     info=repos["results"][i]
-    
+    if info["openfda"]:
+        nombre = info["openfda"]["generic_name"][0]
     
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     
@@ -28,15 +29,18 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        content = "<html><body>"
-        
-        if info["openfda"]:
-            print("El nombre del medicamento es", info["openfda"]["generic_name"][0])
+        mensaje += "<p>" + "Información medicamento" + "</p>"
+        for a in nombre:
+            mensaje += a + "<br>"
+        mensaje += "<ul>"
+        mensaje += "<li>Recurso solicitado: {}</li>".format(self.path)
+        mensaje += "</ul>"
+        mensaje += "</body>"
+        mensaje += "</html>"
 
         
         self.wfile.write(bytes(mensaje, "utf8"))
         return
-
     
 Handler = testHTTPRequestHandler
 
