@@ -10,7 +10,7 @@ conn.request("GET", "/drug/label.json", None, headers)
 #Almacenamos la información en la variable r1.
 r1 = conn.getresponse()
 print(r1.status, r1.reason)
-#Decodificamos la información obtenida para poder leerlo correctamente.
+#Decodificamos la información obtenida para poder leerlo correctamente (nosotros somos el cliente, por eso se decodifica la información).
 repos_raw = r1.read().decode("utf-8")
 conn.close()
 #En la variable repos guardamos toda la información del archivo descargado y decodificado.
