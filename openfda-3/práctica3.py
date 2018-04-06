@@ -30,7 +30,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
         mensaje = "<body style = 'background-color: lightblue'><html>"
-        mensaje += "<b>Los nombres de los 10 medicamentos son:</b><br>"
+        mensaje += "<h1><b>Los nombres de los 10 medicamentos son:</b></h1>"
 
         for a in nombre:
             mensaje += a + "<br>"
