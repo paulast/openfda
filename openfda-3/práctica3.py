@@ -3,9 +3,8 @@ import json
 import http.server
 import socketserver
 
-
-PORT = 8020
-
+PORT = 8002
+nombre = list()
 
 headers = {'User-Agent': 'http-client'}
 
@@ -18,38 +17,37 @@ conn.close()
 
 repos = json.loads(repos_raw)
 for i in range(len(repos["results"])):
-    info=repos["results"][i]
+    info = repos["results"][i]
     if info["openfda"]:
-        nombre = info["openfda"]["generic_name"][0]
-    
-class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
-    
-    def do_GET(self):
+        nombre.append(info["openfda"]["generic_name"][0])
 
+
+class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
+
+    def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        mensaje += "<p>" + "Información medicamento" + "</p>"
+
+        mensaje = "<body><html>"
         for a in nombre:
             mensaje += a + "<br>"
-        mensaje += "<ul>"
-        mensaje += "<li>Recurso solicitado: {}</li>".format(self.path)
-        mensaje += "</ul>"
+
         mensaje += "</body>"
         mensaje += "</html>"
 
-        
         self.wfile.write(bytes(mensaje, "utf8"))
         return
-    
+
+
 Handler = testHTTPRequestHandler
 
 httpd = socketserver.TCPServer(("", PORT), Handler)
 print("Sirviendo en puerto: {}".format(PORT))
-
 
 try:
     httpd.serve_forever()
 except KeyboardInterrupt:
     print("Servidor detenido")
     httpd.server_close()
+
