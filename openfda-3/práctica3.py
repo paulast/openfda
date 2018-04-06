@@ -3,7 +3,7 @@ import json
 import http.server
 import socketserver
 
-PORT = 8002
+PORT = 8011
 nombre = list()
 
 headers = {'User-Agent': 'http-client'}
@@ -29,7 +29,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-        mensaje = "<body><html>"
+        mensaje = "<body style = 'background-color: lightblue'><html>"
+        mensaje += "<b>Los nombres de los 10 medicamentos son:</b><br>"
+
         for a in nombre:
             mensaje += a + "<br>"
 
