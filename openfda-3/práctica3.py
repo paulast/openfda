@@ -31,7 +31,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
         mensaje = "<body style = 'background-color: lightblue'><html>"
         mensaje += "<h1><b>Los nombres de los 10 medicamentos son:</b></h1>"
-
+        mensaje += "<h2>El nombre del segundo medicamento no aparece indicado</h2>"
+        
         for a in nombre:
             mensaje += a + "<br>"
 
