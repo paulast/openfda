@@ -15,3 +15,7 @@ repos = json.loads(repos_raw)
 for i in range(len(repos["results"])):
     info=repos["results"][i]
     print("El nombre del fabricante es", info["openfda"]["manufacturer_name"][0])
+    
+#Empleamos el mismo código que el utilizado en el programa 2 de la práctica 1, a excepción
+#de la función search, que nos ayuda a buscar las sustancias con aspirina para obtener la información 
+#únicamente de estos y desechar el resto. 
