@@ -8,7 +8,7 @@ PORT=8000
 
 
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
-    # GET
+
     OPENFDA_API_URL="api.fda.gov"
     OPENFDA_API_EVENT="/drug/event.json"
     OPENFDA_API_DRUG='&search=patient.drug.medicinalproduct:'
@@ -61,39 +61,38 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-
-
-
-        self.send_response(200)
-
-
-        self.send_header('Content-type','text/html')
-        self.end_headers()
-
-        resource = self.path.split("?")
-        if len(resource)>1:
-            parametros=resource[1]
+        recurso = self.path.split("?")
+        if len(recurso)>1:
+            parametros=recurso[1]
 
         else:
             parametros = ""
 
 
         if parametros:
-            partes_limite = parametros.split("=")
-            if partes_limite[0] == "limit":
-                limit=int(partes_limite[1])
+            limite = parametros.split("=")
+            if limite[0] == "limit":
+                limit=int(limite[1])
 
 
         else:
             print("No hay parámetro")
 
-        
+
         if self.path=='/':
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             html=self.get_index()
             self.wfile.write(bytes(html, "utf8"))
+
         elif 'listDrugs' in self.path:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
-            conn.request("GET", self.OPENFDA_API_EVENT + "?limit=10")
+            conn.request("GET", self.OPENFDA_API_EVENT + "?limit=" +str(limit))
             r1 = conn.getresponse()
             repos_raw = r1.read().decode("utf8")
             repos = json.loads(repos_raw)
@@ -124,6 +123,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
 
         elif 'listCompanies' in self.path:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
             conn.request("GET", self.OPENFDA_API_EVENT + "?limit=10")
             r1 = conn.getresponse()
@@ -154,18 +156,22 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(mensaje, "utf8"))
 
         elif 'listWarnings' in self.path:
-            advertencias = []
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
-            conn.request("GET", self.OPENFDA_API_EVENT + "?limit=10")
+            conn.request("GET", self.OPENFDA_API_EVENT + "?limit="+str(limit))
             r1 = conn.getresponse()
             repos_raw = r1.read().decode("utf8")
             repos = json.loads(repos_raw)
             info = repos['results']
+            advertencias = []
 
             for i in info:
 
-                if "warnings" in i:
-                    advertencias.append([i['warnings']])
+                if ('warnings' in i):
+                    advertencias.append(i['warnings'])
+
                 else:
                     advertencias.append("No contiene advertencias")
 
@@ -191,6 +197,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(mensaje, "utf8"))
 
         elif  'searchDrug' in self.path:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             farmaco=self.path.split('=')[1]
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
             conn.request("GET", self.OPENFDA_API_EVENT + "?limit=10" + self.OPENFDA_API_DRUG + farmaco)
@@ -225,6 +234,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(mensaje, "utf8"))
 
         elif 'searchCompany' in self.path:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             empresa=self.path.split('=')[1]
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
             conn.request("GET", self.OPENFDA_API_EVENT + "?limit=10" + self.OPENFDA_API_COMPANY + empresa)
@@ -256,11 +268,16 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                                 """
             self.wfile.write(bytes(mensaje, "utf8"))
 
+        elif "secret" in self.path:
+            self.send_error(401)
+            self.send_header("www-Aunthenticate", "Basic real")
+            self.end_header()
+
         else:
             self.send_error(404)
-            self.send_header('Content-type', 'text/plain; charset = utf-8')
+            self.send_header("Content-type", "text/plain; charset=utf-8")
             self.end_headers()
-            self.wfile.write("Recurso no encontrado".format(self.path).encode())
+            self.wfile.write("Recurso no encontrado '{}'.".format(self.path).encode())
 
         return
 
@@ -268,7 +285,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
 socketserver.TCPServer.allow_reuse_address= True
 
-#Handler = http.server.SimpleHTTPRequestHandler
+
 Handler = testHTTPRequestHandler
 
 httpd = socketserver.TCPServer(("", PORT), Handler)
