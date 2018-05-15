@@ -279,6 +279,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                                 """
             self.wfile.write(bytes(mensaje, "utf8"))
 
+            #Ahora trabajamos con los errores. Con 401
         elif "secret" in self.path:
             self.send_error(401)
             self.send_header("www-Aunthenticate", "Basic real")
