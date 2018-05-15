@@ -279,12 +279,18 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                                 """
             self.wfile.write(bytes(mensaje, "utf8"))
 
-            #Ahora trabajamos con los errores. Con 401
+            #Ahora trabajamos con los errores de los clientes 401 y 404.
+            #Por otra parte, el código 301 redirige a la página principal.
         elif "secret" in self.path:
             self.send_error(401)
             self.send_header("www-Aunthenticate", "Basic real")
             self.end_header()
-
+           
+        elif "redirect" in self.path:
+            self.send_response(301)
+            self.send_header("Location", "http://localhost:" + str(PORT))
+            self.end_headers()
+        
         else:
             self.send_error(404)
             self.send_header("Content-type", "text/plain; charset=utf-8")
