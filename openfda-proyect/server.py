@@ -15,7 +15,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     OPENFDA_API_COMPANY='&search=companynumb:'
 
 
-
+#Definimos get_index como la página principal html donde aparecen las distintas opciones. 
     def get_index(self):
         html = """
             <html>
@@ -59,8 +59,10 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
 
 
+    
     def do_GET(self):
 
+        #Separamos las componentes de la url para poder "coger" solo el número de limit.
         recurso = self.path.split("?")
         if len(recurso)>1:
             parametros=recurso[1]
@@ -78,6 +80,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             print("No hay parámetro")
 
+#Si no hay parámetro, me encuentro en la página principal.
 
         if self.path=='/':
 
@@ -87,10 +90,12 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             html=self.get_index()
             self.wfile.write(bytes(html, "utf8"))
 
+        #Cuando sea "listDrugs" haremos que devuelva el nombre de los fármacos.    
         elif 'listDrugs' in self.path:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+            
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
             conn.request("GET", self.OPENFDA_API_EVENT + "?limit=" +str(limit))
             r1 = conn.getresponse()
