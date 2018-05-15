@@ -96,16 +96,22 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             
+            #Bajamos y decodificamos la información.
             conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
+            #Utilizamos "limit" para poder elegir cuántos nombres queremos que nos devuelva.
             conn.request("GET", self.OPENFDA_API_EVENT + "?limit=" +str(limit))
+            #Guardamos la información en r1.
             r1 = conn.getresponse()
             repos_raw = r1.read().decode("utf8")
+            #La información en json es guardada es la variable repos.
             repos = json.loads(repos_raw)
             info = repos['results']
+            #Creamos una lista que utilizaremos más tarde.
             farmacos = []
             for i in info:
+                #Añadimos a la lista los nombres de los medicamentos mediante el bucle for.
                 farmacos += [i['patient']['drug'][0]['medicinalproduct']]
-
+            #Escribimos el  mensaje en html para que podamos leerlo.
             mensaje = """
                                 <html>
                                     <head>
@@ -126,7 +132,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                             """
             self.wfile.write(bytes(mensaje, "utf8"))
 
-
+#Volvemos a hacer lo mismo para el resto de variables.
         elif 'listCompanies' in self.path:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
